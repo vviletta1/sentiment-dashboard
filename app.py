@@ -3,10 +3,6 @@ import pandas as pd
 from transformers import pipeline
 import collections
 
-# --- Logo or Brand Image in Sidebar ---
-    caption="VeeBot AI"
-)
-
 # --- Custom Styles for Modern Look ---
 st.markdown("""
     <style>
