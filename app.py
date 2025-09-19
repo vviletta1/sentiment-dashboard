@@ -71,8 +71,10 @@ for i, emotion_scores in enumerate(emotions_list):
         row[entry['label']] = entry['score']
     emotion_rows.append(row)
 avg_emotion = {k: (emotion_totals[k] / emotion_counts[k]) for k in emotion_totals}
-top_emotion = max(avg_emotion, key=avg_emotion.get).capitalize()
-
+"top_emotion": [
+    max({k: v for k, v in row.items() if k != "text"}, key=lambda x: row[x]) if len(row) > 1 else ""
+    for row in emotion_rows
+]
 # --- KPI CARDS ---
 col1, col2, col3 = st.columns(3)
 with col1:
