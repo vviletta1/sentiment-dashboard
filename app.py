@@ -4,9 +4,6 @@ from transformers import pipeline
 import collections
 
 # --- Logo or Brand Image in Sidebar ---
-st.sidebar.image(
-    "https://i.imgur.com/9b4GdBR.png",  # Change to your own logo URL if you want!
-    width=120,
     caption="VeeBot AI"
 )
 
@@ -42,7 +39,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Title and Sidebar Header ---
-st.title("🌈 Sentiment & Emotion Dashboard")
+st.title("Sentiment & Emotion Dashboard")
 st.sidebar.header("📂 Upload or Paste Text Data")
 
 # --- Load Hugging Face pipelines (force PyTorch)
