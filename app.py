@@ -6,7 +6,7 @@ import plotly.express as px
 
 # --- Sidebar Logo & Title ---
 st.sidebar.image(
-    "https://i.imgur.com/9b4GdBR.png",  # Change to your logo!
+    "https://i.imgur.com/9b4GdBR.png",
     width=120,
     caption="VeeBot AI"
 )
@@ -86,10 +86,12 @@ with col2:
 with col3:
     st.markdown(f"""<div class='kpi-card'><span style='font-size:32px;'>{top_emotion}</span><br/><span style='color:#1d3557;'>Top Emotion</span></div>""", unsafe_allow_html=True)
 
-# --- Download Button --- (robust for "top_emotion" KeyError)
+# --- Divider after KPIs ---
+st.markdown("<hr style='margin:25px 0; border:1px solid #e0e0e0;'/>", unsafe_allow_html=True)
+
+# --- Download Button (robust for "top_emotion" KeyError) ---
 top_emotion_list = []
 for row in emotion_rows:
-    # Only keep emotion keys (exclude 'text')
     emotion_only = {k: v for k, v in row.items() if k != "text"}
     if emotion_only:
         top = max(emotion_only, key=emotion_only.get)
@@ -105,6 +107,9 @@ result_df = pd.DataFrame({
 })
 st.download_button("⬇️ Download Results as CSV", result_df.to_csv(index=False), file_name="dashboard_results.csv")
 
+# --- Divider after Download Button ---
+st.markdown("<hr style='margin:25px 0; border:1px solid #e0e0e0;'/>", unsafe_allow_html=True)
+
 # --- Pie Chart (Plotly) ---
 st.subheader("🎯 Emotion Distribution")
 emotion_sums = {k:0 for k in avg_emotion.keys()}
@@ -119,6 +124,9 @@ if any(emotion_sums.values()):
 else:
     st.info("No emotion data to display in pie chart yet.")
 
+# --- Divider after Pie Chart ---
+st.markdown("<hr style='margin:25px 0; border:1px solid #e0e0e0;'/>", unsafe_allow_html=True)
+
 # --- Automated Insights ---
 st.subheader("🤖 Automated Insights")
 insight = f"""
@@ -132,6 +140,9 @@ else:
     insight += f"- **Sample size:** {len(texts)} messages"
 st.markdown(insight)
 
+# --- Divider after Automated Insights ---
+st.markdown("<hr style='margin:25px 0; border:1px solid #e0e0e0;'/>", unsafe_allow_html=True)
+
 # --- TABS Layout ---
 tab1, tab2 = st.tabs(["📊 Sentiment", "📝 Recent Messages"])
 with tab1:
@@ -140,7 +151,7 @@ with tab1:
 
 with tab2:
     for i, text in enumerate(texts[:10]):
-        st.markdown(f"<div style='background-color:#e9ecef; border-radius:12px; padding:10px; margin-bottom:12px;'>"
+        st.markdown(f"<div style='background-color:#e9ecef; border-radius:12px; padding:10px; margin-bottom:6px;'>"
                     f"<strong>Text:</strong> {text[:150]}{'...' if len(text) > 150 else ''}<br>"
                     f"<strong>Sentiment:</strong> <span style='color:#457b9d'>{sentiments[i]['label']}</span> "
                     f"({sentiments[i]['score']:.2f})<br>"
@@ -148,3 +159,5 @@ with tab2:
                     f"({max(emotions_list[i], key=lambda x: x['score'])['score']:.2f})"
                     f"</div>",
                     unsafe_allow_html=True)
+        st.markdown("<hr style='margin:8px 0; border:0.5px solid #dadada;'/>", unsafe_allow_html=True)
+
