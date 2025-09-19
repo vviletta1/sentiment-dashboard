@@ -4,13 +4,16 @@ from transformers import pipeline
 import collections
 import plotly.express as px
 
-# --- Logo or Brand Image in Sidebar ---
+# --- Sidebar Logo & Title ---
 st.sidebar.image(
-    "https://i.imgur.com/9b4GdBR.png",  # Change to your own logo URL if you want!
+    "https://i.imgur.com/9b4GdBR.png",  # Change to your logo!
     width=120,
     caption="VeeBot AI"
 )
+st.sidebar.title("💬 VeeBot AI Dashboard")
+st.sidebar.markdown("Gain instant insights into customer mood & emotion with state-of-the-art AI.")
 
+# --- Custom Styles ---
 st.markdown("""
     <style>
     .main {background-color: #f9fafb;}
@@ -71,10 +74,8 @@ for i, emotion_scores in enumerate(emotions_list):
         row[entry['label']] = entry['score']
     emotion_rows.append(row)
 avg_emotion = {k: (emotion_totals[k] / emotion_counts[k]) for k in emotion_totals}
-"top_emotion": [
-    max({k: v for k, v in row.items() if k != "text"}, key=lambda x: row[x]) if len(row) > 1 else ""
-    for row in emotion_rows
-]
+top_emotion = max(avg_emotion, key=avg_emotion.get).capitalize() if avg_emotion else ""
+
 # --- KPI CARDS ---
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -85,12 +86,22 @@ with col2:
 with col3:
     st.markdown(f"""<div class='kpi-card'><span style='font-size:32px;'>{top_emotion}</span><br/><span style='color:#1d3557;'>Top Emotion</span></div>""", unsafe_allow_html=True)
 
-# --- Download Button ---
+# --- Download Button --- (robust for "top_emotion" KeyError)
+top_emotion_list = []
+for row in emotion_rows:
+    # Only keep emotion keys (exclude 'text')
+    emotion_only = {k: v for k, v in row.items() if k != "text"}
+    if emotion_only:
+        top = max(emotion_only, key=emotion_only.get)
+    else:
+        top = ""
+    top_emotion_list.append(top)
+
 result_df = pd.DataFrame({
     "text": texts,
     "sentiment": sentiment_df["label"],
     "sentiment_score": sentiment_df["score"],
-    "top_emotion": [max(row[1:], key=row.get) for row in emotion_rows]
+    "top_emotion": top_emotion_list
 })
 st.download_button("⬇️ Download Results as CSV", result_df.to_csv(index=False), file_name="dashboard_results.csv")
 
@@ -98,11 +109,15 @@ st.download_button("⬇️ Download Results as CSV", result_df.to_csv(index=Fals
 st.subheader("🎯 Emotion Distribution")
 emotion_sums = {k:0 for k in avg_emotion.keys()}
 for row in emotion_rows:
-    if row:
-        main_emotion = max({k:v for k,v in row.items() if k!="text"}, key=lambda x: row[x])
+    emotion_only = {k: v for k, v in row.items() if k != "text"}
+    if emotion_only:
+        main_emotion = max(emotion_only, key=emotion_only.get)
         emotion_sums[main_emotion] += 1
-fig = px.pie(names=list(emotion_sums.keys()), values=list(emotion_sums.values()), title="Top Detected Emotions")
-st.plotly_chart(fig, use_container_width=True)
+if any(emotion_sums.values()):
+    fig = px.pie(names=list(emotion_sums.keys()), values=list(emotion_sums.values()), title="Top Detected Emotions")
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info("No emotion data to display in pie chart yet.")
 
 # --- Automated Insights ---
 st.subheader("🤖 Automated Insights")
@@ -133,4 +148,3 @@ with tab2:
                     f"({max(emotions_list[i], key=lambda x: x['score'])['score']:.2f})"
                     f"</div>",
                     unsafe_allow_html=True)
-
